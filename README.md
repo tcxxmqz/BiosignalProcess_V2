@@ -1,4 +1,4 @@
-# BiosignalProcessing
+# BiosignalProcess_V2
 ###### 生物信号处理工具
 
 此工具包基于Python 3.8构建，主要用于处理科研实验获得的生理信号数据。

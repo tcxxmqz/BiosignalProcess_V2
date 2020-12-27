@@ -3,12 +3,24 @@ from tools.ecg import *
 from tools.emg import *
 from tools.fnirs import *
 
-if __name__ == "__main__":
-    filepath = [r"./data/1/exper1.mat",
-                r"./data/2/exper2.mat",
-                r"./data/3/exper3.mat",
-                r"./data/4/exper4.mat",
-                r"./data/5/exper5.mat"]
+
+def exper11_16():
+    """
+        ************************************************************************************************
+
+        2020-11-16 轮椅与VR同步实验数据处理
+            实验人员5人：刘腾、王虹杰、牛冠学、邵尉、柳富强。
+            实验流程：进入场景15秒后，轮椅分别以0.2、0.4、0.6、0.8米每秒前进8米后停止。
+            实验时长：60秒、40秒、34秒、30秒。
+
+        ************************************************************************************************
+        """
+
+    filepath = [r"./exper_11.16/data/1/exper1.mat",
+                r"./exper_11.16/data/2/exper2.mat",
+                r"./exper_11.16/data/3/exper3.mat",
+                r"./exper_11.16/data/4/exper4.mat",
+                r"./exper_11.16/data/5/exper5.mat"]
     cut_time = [[778, 924, 1019, 1189],
                 [388, 579, 823, 901],
                 [578, 714, 879, 989],
@@ -19,20 +31,20 @@ if __name__ == "__main__":
         file = filepath[k]
         for i in range(4):
             # EDA处理
-            eda, eda_saveasfilename = eda_signal_cut_and_save(file, k+1, i+1, cut_time[k][i], show=False)
-            eda_process(eda, i+1, eda_saveasfilename)
+            eda, eda_saveasfilename = eda_signal_cut_and_save(file, k + 1, i + 1, cut_time[k][i], show=False)
+            eda_process(eda, i + 1, eda_saveasfilename)
             # ECG处理
-            ecg, ecg_saveasfilename = ecg_signal_cut_and_save(file, k+1, i+1, cut_time[k][i], show=False)
-            ecg_process(ecg, i+1, ecg_saveasfilename)
+            ecg, ecg_saveasfilename = ecg_signal_cut_and_save(file, k + 1, i + 1, cut_time[k][i], show=False)
+            ecg_process(ecg, i + 1, ecg_saveasfilename)
             # EMG处理
-            emg, emg_saveasfilename = emg_signal_cut_and_save(file, k+1, i+1, cut_time[k][i], show=False)
-            emg_process(emg, i+1, emg_saveasfilename)
+            emg, emg_saveasfilename = emg_signal_cut_and_save(file, k + 1, i + 1, cut_time[k][i], show=False)
+            emg_process(emg, i + 1, emg_saveasfilename)
 
-    fnirs_filepath = [r"./data/1/fnirs/exper1.csv",
-                      r"./data/2/fnirs/exper2.csv",
-                      r"./data/3/fnirs/exper3.csv",
-                      r"./data/4/fnirs/exper4.csv",
-                      r"./data/5/fnirs/exper5.csv"]
+    fnirs_filepath = [r"./exper_11.16/data/1/fnirs/exper1.csv",
+                      r"./exper_11.16/data/2/fnirs/exper2.csv",
+                      r"./exper_11.16/data/3/fnirs/exper3.csv",
+                      r"./exper_11.16/data/4/fnirs/exper4.csv",
+                      r"./exper_11.16/data/5/fnirs/exper5.csv"]
     fnirs_cut_time = [[447, 596, 724, 859],
                       [26, 166, 269, 347],
                       [218, 353, 515, 627],
@@ -47,3 +59,6 @@ if __name__ == "__main__":
                                                                     show_CHx=None)
             fnirs_CHx_process(fnirs, "all", fnirs_saveasfilename, show=False)
 
+
+if __name__ == "__main__":
+    exper11_16()
