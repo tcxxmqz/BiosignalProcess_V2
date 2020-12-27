@@ -218,7 +218,7 @@ def fnirs_allCHx_plot(ts: ndarray = None, fnirs_signal=None, path: str = None, s
         plt.close(fig)
 
 
-def fnirs_interpolate(fnirs_signal, sampling_rate=2000):
+def fnirs_interpolate(fnirs_signal: ndarray, sampling_rate: int = 2000):
     """
     脑血流信号插值函数，输入5Hz的脑血流数据，输出2000Hz脑血流数据。
 

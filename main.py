@@ -52,7 +52,7 @@ def exper11_16():
                       [39, 135, 214, 304]]
 
     # 第4个人的第4组脑血流数据不能用，会报错
-    for k in range(1):
+    for k in range(5):
         fnirs_file = fnirs_filepath[k]
         for i in range(4):
             fnirs, fnirs_saveasfilename = fnirs_signal_cut_and_save(fnirs_file, k + 1, i + 1, fnirs_cut_time[k][i],
