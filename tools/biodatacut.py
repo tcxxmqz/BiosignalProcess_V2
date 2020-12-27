@@ -5,7 +5,7 @@ from pandas import read_csv
 global signal_data
 
 
-def biosignal_cut(biodata_file, start_time, stop_time, sampling_rate=2000, channel='all', save_filepath=None):
+def biosignal_cut(biodata_file, start_time=None, stop_time=None, sampling_rate=2000, channel='all', save_filepath=None):
     """
     信号切分函数，输入原始大段生理信号数据，切分时间段，输出对应信号分段
 

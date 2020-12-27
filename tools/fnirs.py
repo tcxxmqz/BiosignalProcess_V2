@@ -76,8 +76,7 @@ def fnirs_CHx_process(raw_signal, CH: str, path=None, show=False):
     elif CH in ['CH5', 'CH8', 'CH11', 'CH14', 'CH17', 'CH4', 'CH7', 'CH10',
                 'CH13', 'CH16', 'CH19', 'CH6', 'CH9', 'CH12', 'CH15', 'CH18']:
         CHx_signal_cleaned = nk.signal_filter(raw_signal[CH].astype("float32"), sampling_rate=5, lowcut=0.02,
-                                              highcut=0.1,
-                                              method="butterworth")
+                                              highcut=0.1, method="butterworth")
 
         sampling_rate = 5
         length = len(CHx_signal_cleaned)
@@ -219,8 +218,31 @@ def fnirs_allCHx_plot(ts: ndarray = None, fnirs_signal=None, path: str = None, s
         plt.close(fig)
 
 
-def fnirs_interpolate():
-    pass
+def fnirs_interpolate(fnirs_signal, sampling_rate=2000):
+    """
+    脑血流信号插值函数，输入5Hz的脑血流数据，输出2000Hz脑血流数据。
+
+    Parameters
+    ----------
+    fnirs_signal 脑血流原始数据
+    sampling_rate 插值后的数据采样频率
+
+    Returns 插值后的脑血流数据
+    -------
+
+    """
+
+    multiple = int(sampling_rate / 5)
+    x = np.arange(0, len(fnirs_signal))
+    f1 = interp1d(x, fnirs_signal, kind="quadratic")
+    x_new = np.linspace(min(x), max(x), len(fnirs_signal) * multiple)
+    fnirs_signal_new = f1(x_new)
+
+    length = len(fnirs_signal_new)
+    T = (length - 1) / sampling_rate
+    ts = np.linspace(0, T, length, endpoint=True)
+
+    return fnirs_signal_new, ts
 
 
 if __name__ == "__main__":
@@ -230,7 +252,7 @@ if __name__ == "__main__":
     x = np.arange(0, len(y))
     # print(x)
     f1 = interp1d(x, y, kind="quadratic")
-    x1 = np.linspace(x.min(), x.max(), len(y) * 400)
+    x1 = np.linspace(min(x), max(x), len(y) * 400)
     y1 = f1(x1)
     plt.subplot(211)
     plt.plot(x, y)
