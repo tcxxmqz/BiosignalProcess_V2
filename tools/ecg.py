@@ -46,15 +46,18 @@ def ecg_process(raw_signal, exper, path=None):
     print("ecg_process()正在处理第{}次实验数据。".format(exper))
     biosppy_ecg.ecg(signal=raw_signal, sampling_rate=2000, show=False, plot_method="qz", path=file_path)
 
-# # 载入数据
-# path = "C:\\Python Files\\biology_signal\\data_set\\1B\\5\\XD.txt"
-# raw_signals = np.loadtxt(path)
-#
-# # 信号处理及绘图 neurokit2
-# # signals, info = nk.ecg_process(raw_signals, sampling_rate=2000)
-# # fig = nk.ecg_plot(signals, sampling_rate=2000)
-#
-# # 信号处理及绘图 biosppy
-# biosppy_ecg.ecg(signal=raw_signals, sampling_rate=2000, show=True, plot_method='qz', path=path)
-#
-# plt.show()
+
+if __name__ == "__main__":
+
+    # 载入数据
+    path = "C:\\Python Files\\biology_signal\\data_set\\1B\\5\\XD.txt"
+    raw_signals = np.loadtxt(path)
+
+    # 信号处理及绘图 neurokit2
+    # signals, info = nk.ecg_process(raw_signals, sampling_rate=2000)
+    # fig = nk.ecg_plot(signals, sampling_rate=2000)
+
+    # 信号处理及绘图 biosppy
+    biosppy_ecg.ecg(signal=raw_signals, sampling_rate=2000, show=True, plot_method='qz', path=path)
+
+    plt.show()

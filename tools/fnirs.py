@@ -3,6 +3,7 @@ from tools.biodatacut import *
 from numpy.core.multiarray import ndarray
 from biosppy.plotting import *
 import pandas as pd
+from scipy.interpolate import interp1d
 
 
 def fnirs_signal_cut_and_save(file_path, subject, exp_time, start_time, show_CHx: str = None):
@@ -14,7 +15,8 @@ def fnirs_signal_cut_and_save(file_path, subject, exp_time, start_time, show_CHx
     :param exp_time:此受试者的第几次实验
     :param start_time:此次实验的开始时间点
     :param show_CHx:绘制脑血流图像，输入None不绘制图像；输入通道名称，如CH4，绘制此通道的数据；输入all，绘制所有通道的数据到一个图
-    :return:返回剪切后的数据，为DataFrame类型的变量fnirs_signal；返回剪切后的数据csv文件保存位置，为字符串变量
+    :return:返回剪切后的数据，为DataFrame类型的变量fnirs_signal；
+    返回剪切后的数据csv文件保存位置，为字符串变量
     """
 
     exp = [60, 40, 34, 30]
@@ -215,3 +217,24 @@ def fnirs_allCHx_plot(ts: ndarray = None, fnirs_signal=None, path: str = None, s
     else:
         # close
         plt.close(fig)
+
+
+def fnirs_interpolate():
+    pass
+
+
+if __name__ == "__main__":
+    path = r"C:\Python Files\BiosignalProcess_V2\data\exper_11.16\1\fnirs\exper_1_1_fnirs.csv"
+    a = pd.read_csv(path)
+    y = a["CH4"]
+    x = np.arange(0, len(y))
+    # print(x)
+    f1 = interp1d(x, y, kind="quadratic")
+    x1 = np.linspace(x.min(), x.max(), len(y) * 400)
+    y1 = f1(x1)
+    plt.subplot(211)
+    plt.plot(x, y)
+    plt.subplot(212)
+    plt.plot(x1, y1)
+    plt.show()
+    print("len x={}, y={}, x1={}, y1={}".format(len(x), len(y), len(x1), len(y1)))
