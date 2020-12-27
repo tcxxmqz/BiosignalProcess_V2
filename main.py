@@ -61,4 +61,54 @@ def exper11_16():
 
 
 if __name__ == "__main__":
-    exper11_16()
+    filepath1 = [r"./data/exper_12.26/1/exper1.mat",
+                 r"./data/exper_12.26/2/exper2.mat",
+                 r"./data/exper_12.26/3/exper3.mat",
+                 r"./data/exper_12.26/4/exper4.mat",
+                 r"./data/exper_12.26/5/exper5.mat",
+                 r"./data/exper_12.26/6/exper6.mat",
+                 r"./data/exper_12.26/7/exper7.mat",
+                 r"./data/exper_12.26/8/exper8.mat",
+                 r"./data/exper_12.26/9/exper9.mat",
+                 r"./data/exper_12.26/10/exper10.mat",
+                 r"./data/exper_12.26/11/exper11.mat"]
+
+    filepath2 = [r"./data/exper_12.26/1/fnirs/exper1.csv",
+                 r"./data/exper_12.26/2/fnirs/exper2.csv",
+                 r"./data/exper_12.26/3/fnirs/exper3.csv",
+                 r"./data/exper_12.26/4/fnirs/exper4.csv",
+                 r"./data/exper_12.26/5/fnirs/exper5.csv",
+                 r"./data/exper_12.26/6/fnirs/exper6.csv",
+                 r"./data/exper_12.26/7/fnirs/exper7.csv",
+                 r"./data/exper_12.26/8/fnirs/exper8.csv",
+                 r"./data/exper_12.26/9/fnirs/exper9.csv",
+                 r"./data/exper_12.26/10/fnirs/exper10.csv",
+                 r"./data/exper_12.26/11/fnirs/exper11.csv"]
+
+    StartTime1 = [226, 207, 207, 116, 87, 147, 34, 175, 292, 113, 244]
+    StartTime2 = [50.4, 53.2, 62.4, 27.8, 34.8, 36.4, 54.2, 38.4, 290.8, 203, 45.8]
+
+    picture = [5725, 3010, 4130, 5760, 3019, 4008, 5780, 5168,
+               4658, 5780.1, 4810, 5825, 3266, 4672, 5831, 3195, 4652]
+
+    for k in range(11):
+        file1 = filepath1[k]
+        file2 = filepath2[k]
+        for i in range(17):
+            # ECG
+            _file1 = file1[:-4] + "_ecg_" + str(picture[i]) + ".txt"
+            # print("{}--{}".format(StartTime1[k]+i*45, StartTime1[k]+i*45+20))
+            biosignal_cut(file1, start_time=StartTime1[k]+i*45, stop_time=StartTime1[k]+i*45+20, sampling_rate=2000,
+                          channel=0, save_filepath=_file1)
+            # # EMG
+            _file2 = file1[:-4] + "_emg_" + str(picture[i]) + ".txt"
+            biosignal_cut(file1, start_time=StartTime1[k]+i*45, stop_time=StartTime1[k]+i*45+20, sampling_rate=2000,
+                          channel=1, save_filepath=_file2)
+            # EDA
+            _file3 = file1[:-4] + "_eda_" + str(picture[i]) + ".txt"
+            biosignal_cut(file1, start_time=StartTime1[k]+i*45, stop_time=StartTime1[k]+i*45+20, sampling_rate=2000,
+                          channel=2, save_filepath=_file3)
+            # fnirs
+            _file4 = file2[:-4] + "_fnirs_" + str(picture[i]) + ".csv"
+            biosignal_cut(file2, start_time=StartTime2[k]+i*45, stop_time=StartTime2[k]+i*45+20, sampling_rate=5,
+                          channel="all", save_filepath=_file4)
