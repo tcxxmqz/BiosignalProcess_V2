@@ -16,11 +16,11 @@ def exper11_16():
         ************************************************************************************************
         """
 
-    filepath = [r"./data/exper_11.16/1/exper1.mat",
-                r"./data/exper_11.16/2/exper2.mat",
-                r"./data/exper_11.16/3/exper3.mat",
-                r"./data/exper_11.16/4/exper4.mat",
-                r"./data/exper_11.16/5/exper5.mat"]
+    filepath = [r"./exper_11.16/data/1/exper1.mat",
+                r"./exper_11.16/data/2/exper2.mat",
+                r"./exper_11.16/data/3/exper3.mat",
+                r"./exper_11.16/data/4/exper4.mat",
+                r"./exper_11.16/data/5/exper5.mat"]
     cut_time = [[778, 924, 1019, 1189],
                 [388, 579, 823, 901],
                 [578, 714, 879, 989],
@@ -40,11 +40,11 @@ def exper11_16():
             emg, emg_saveasfilename = emg_signal_cut_and_save(file, k + 1, i + 1, cut_time[k][i], show=False)
             emg_process(emg, i + 1, emg_saveasfilename)
 
-    fnirs_filepath = [r"./data/exper_11.16/1/fnirs/exper1.csv",
-                      r"./data/exper_11.16/2/fnirs/exper2.csv",
-                      r"./data/exper_11.16/3/fnirs/exper3.csv",
-                      r"./data/exper_11.16/4/fnirs/exper4.csv",
-                      r"./data/exper_11.16/5/fnirs/exper5.csv"]
+    fnirs_filepath = [r"./exper_11.16/data/1/fnirs/exper1.csv",
+                      r"./exper_11.16/data/2/fnirs/exper2.csv",
+                      r"./exper_11.16/data/3/fnirs/exper3.csv",
+                      r"./exper_11.16/data/4/fnirs/exper4.csv",
+                      r"./exper_11.16/data/5/fnirs/exper5.csv"]
     fnirs_cut_time = [[447, 596, 724, 859],
                       [26, 166, 269, 347],
                       [218, 353, 515, 627],
