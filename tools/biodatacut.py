@@ -38,7 +38,7 @@ def biosignal_cut(biodata_file, start_time=None, stop_time=None, sampling_rate=2
     # 数据保存到文件
     if save_filepath is not None:
         if channel == "all":
-            with open(save_filepath, "w+") as file:
+            with open(save_filepath, "w+", newline="") as file:
                 signal_data_cut.to_csv(file, index=0, columns=["CH4", "CH5", "CH6", "CH7", "CH8", "CH9", "CH10", "CH11",
                                                                "CH12", "CH13", "CH14", "CH15", "CH16", "CH17", "CH18",
                                                                "CH19"])
@@ -46,7 +46,7 @@ def biosignal_cut(biodata_file, start_time=None, stop_time=None, sampling_rate=2
             print("脑血流数据所有通道，{}-{}秒数据已经保存到文件路径{}".format(start_time, stop_time, save_filepath))
 
         elif channel in [0, 1, 2]:
-            with open(save_filepath, "w+") as file:
+            with open(save_filepath, "w+", newline="") as file:
                 np.savetxt(file, signal_data_cut)
                 file.close()
             print("第{}通道中，{}-{}秒数据已经保存到文件路径{}".format(channel, start_time, stop_time, save_filepath))

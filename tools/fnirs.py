@@ -245,18 +245,55 @@ def fnirs_interpolate(fnirs_signal: ndarray, sampling_rate: int = 2000):
     return fnirs_signal_new, ts
 
 
+def fnirs_interpolate_process(filepath=None, CH="all"):
+    """
+    脑血流数据插值处理并保存到文件，CH选all，保存所有处理后数据到csv文件，指定一个通道，保存一个通道的数据到csv文件。
+
+    Parameters
+    ----------
+    filepath 原始脑血流数据文件路径
+    CH 要处理的通道
+
+    Returns 无
+    -------
+
+    """
+    raw_signal = pd.read_csv(filepath)
+
+    if CH == "all":
+        CHx = ["CH4", "CH5", "CH6", "CH7", "CH8", "CH9", "CH10", "CH11", "CH12",
+               "CH13", "CH14", "CH15", "CH16", "CH17", "CH18", "CH19"]
+        interpolated_signal = pd.DataFrame()
+
+        for ch in CHx:
+            interpolated_signal[ch], ts = fnirs_interpolate(raw_signal[ch].astype("float32"), sampling_rate=2000)
+            interpolated_signal[ch] = interpolated_signal[ch].astype("float32")
+
+        savepath = filepath[:-4] + "_interpolated.csv"
+        with open(savepath, "w+", newline="") as file:
+            interpolated_signal.to_csv(file, index=True,
+                                       columns=["CH4", "CH5", "CH6", "CH7", "CH8", "CH9", "CH10", "CH11",
+                                                "CH12", "CH13", "CH14", "CH15", "CH16", "CH17", "CH18",
+                                                "CH19"])
+            file.close()
+            print("脑血流所有通道插值处理后数据已保存到文件{}".format(savepath))
+
+    elif CH in ["CH4", "CH5", "CH6", "CH7", "CH8", "CH9", "CH10", "CH11", "CH12", "CH13", "CH14", "CH15", "CH16",
+                "CH17", "CH18", "CH19"]:
+        interpolated_signal = pd.DataFrame()
+        interpolated_signal[CH], ts = fnirs_interpolate(raw_signal[CH].astype("float32"), sampling_rate=2000)
+        interpolated_signal[CH] = interpolated_signal[CH].astype("float32")
+
+        savepath = filepath[:-4] + CH + "_interpolated.txt"
+        with open(savepath, "w+", newline="") as file:
+            interpolated_signal.to_csv(file, index=False, columns=[CH])
+        file.close()
+        print("脑血流{}通道插值处理后数据已保存到文件{}".format(CH, savepath))
+
+
 if __name__ == "__main__":
-    path = r"C:\Python Files\BiosignalProcess_V2\data\exper_11.16\1\fnirs\exper_1_1_fnirs.csv"
-    a = pd.read_csv(path)
-    y = a["CH4"]
-    x = np.arange(0, len(y))
-    # print(x)
-    f1 = interp1d(x, y, kind="quadratic")
-    x1 = np.linspace(min(x), max(x), len(y) * 400)
-    y1 = f1(x1)
-    plt.subplot(211)
-    plt.plot(x, y)
-    plt.subplot(212)
-    plt.plot(x1, y1)
-    plt.show()
-    print("len x={}, y={}, x1={}, y1={}".format(len(x), len(y), len(x1), len(y1)))
+    path = r"C:\Python Files\BiosignalProcess_V2\data\exper_12.26\1\fnirs\exper1_fnirs_3010.csv"
+    fnirs_interpolate_process(path, CH="CH4")
+    path1 = r"C:\Python Files\BiosignalProcess_V2\data\exper_12.26\1\fnirs\exper1_fnirs_3010CH4_interpolated.txt"
+    a = pd.read_csv(path1)
+    print(a)

@@ -91,16 +91,16 @@ if __name__ == "__main__":
     picture = [5725, 3010, 4130, 5760, 3019, 4008, 5780, 5168,
                4658, 5780.1, 4810, 5825, 3266, 4672, 5831, 3195, 4652]
 
-    for k in range(11):
+    for k in range(1):
         file1 = filepath1[k]
         file2 = filepath2[k]
-        for i in range(17):
+        for i in range(1):
             # ECG
             _file1 = file1[:-4] + "_ecg_" + str(picture[i]) + ".txt"
             # print("{}--{}".format(StartTime1[k]+i*45, StartTime1[k]+i*45+20))
             biosignal_cut(file1, start_time=StartTime1[k]+i*45, stop_time=StartTime1[k]+i*45+20, sampling_rate=2000,
                           channel=0, save_filepath=_file1)
-            # # EMG
+            # EMG
             _file2 = file1[:-4] + "_emg_" + str(picture[i]) + ".txt"
             biosignal_cut(file1, start_time=StartTime1[k]+i*45, stop_time=StartTime1[k]+i*45+20, sampling_rate=2000,
                           channel=1, save_filepath=_file2)
@@ -112,3 +112,4 @@ if __name__ == "__main__":
             _file4 = file2[:-4] + "_fnirs_" + str(picture[i]) + ".csv"
             biosignal_cut(file2, start_time=StartTime2[k]+i*45, stop_time=StartTime2[k]+i*45+20, sampling_rate=5,
                           channel="all", save_filepath=_file4)
+            fnirs_interpolate_process(_file4, CH="all")
