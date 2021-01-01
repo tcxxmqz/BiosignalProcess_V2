@@ -134,6 +134,7 @@ def exper12_26():
 
 
 if __name__ == "__main__":
+
     time1 = time.time()
     exper12_26()
     time2 = time.time()
