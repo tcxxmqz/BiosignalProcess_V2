@@ -2,6 +2,7 @@ from tools.eda import *
 from tools.ecg import *
 from tools.emg import *
 from tools.fnirs import *
+import time
 
 
 def exper11_16():
@@ -60,7 +61,14 @@ def exper11_16():
             fnirs_CHx_process(fnirs, "all", fnirs_saveasfilename, show=False)
 
 
-if __name__ == "__main__":
+def exper12_26():
+    """
+    ************************************************************************************************
+    2020-12-26日实验：IAPS国际情感图片库实验
+    实验人员：共11人
+    ************************************************************************************************
+    """
+
     filepath1 = [r"./data/exper_12.26/1/exper1.mat",
                  r"./data/exper_12.26/2/exper2.mat",
                  r"./data/exper_12.26/3/exper3.mat",
@@ -95,20 +103,38 @@ if __name__ == "__main__":
         file1 = filepath1[k]
         file2 = filepath2[k]
         for i in range(17):
-            # ECG
-            _file1 = file1[:-4] + "_ecg_" + str(picture[i]) + ".txt"
-            # print("{}--{}".format(StartTime1[k]+i*45, StartTime1[k]+i*45+20))
-            biosignal_cut(file1, start_time=StartTime1[k]+i*45, stop_time=StartTime1[k]+i*45+20, sampling_rate=2000,
-                          channel=0, save_filepath=_file1)
-            # # EMG
-            _file2 = file1[:-4] + "_emg_" + str(picture[i]) + ".txt"
-            biosignal_cut(file1, start_time=StartTime1[k]+i*45, stop_time=StartTime1[k]+i*45+20, sampling_rate=2000,
-                          channel=1, save_filepath=_file2)
-            # EDA
-            _file3 = file1[:-4] + "_eda_" + str(picture[i]) + ".txt"
-            biosignal_cut(file1, start_time=StartTime1[k]+i*45, stop_time=StartTime1[k]+i*45+20, sampling_rate=2000,
-                          channel=2, save_filepath=_file3)
-            # fnirs
-            _file4 = file2[:-4] + "_fnirs_" + str(picture[i]) + ".csv"
-            biosignal_cut(file2, start_time=StartTime2[k]+i*45, stop_time=StartTime2[k]+i*45+20, sampling_rate=5,
-                          channel="all", save_filepath=_file4)
+            print("正在处理{}-->{}".format(k + 1, i + 1))
+            try:
+                # ECG
+                _file1 = file1[:-4] + "_ecg_" + str(picture[i]) + ".txt"
+                # print("{}--{}".format(StartTime1[k]+i*45, StartTime1[k]+i*45+20))
+                biosignal_cut(file1, start_time=StartTime1[k] + i * 45, stop_time=StartTime1[k] + i * 45 + 20,
+                              sampling_rate=2000,
+                              channel=0, save_filepath=_file1)
+                # EMG
+                _file2 = file1[:-4] + "_emg_" + str(picture[i]) + ".txt"
+                biosignal_cut(file1, start_time=StartTime1[k] + i * 45, stop_time=StartTime1[k] + i * 45 + 20,
+                              sampling_rate=2000,
+                              channel=1, save_filepath=_file2)
+                # EDA
+                _file3 = file1[:-4] + "_eda_" + str(picture[i]) + ".txt"
+                biosignal_cut(file1, start_time=StartTime1[k] + i * 45, stop_time=StartTime1[k] + i * 45 + 20,
+                              sampling_rate=2000,
+                              channel=2, save_filepath=_file3)
+                # fnirs
+                _file4 = file2[:-4] + "_fnirs_" + str(picture[i]) + ".csv"
+                biosignal_cut(file2, start_time=StartTime2[k] + i * 45, stop_time=StartTime2[k] + i * 45 + 20,
+                              sampling_rate=5,
+                              channel="all", save_filepath=_file4)
+                fnirs_interpolate_process(_file4, CH="CH11")
+
+            except ValueError as ex:
+                print("处理{}-->{}时，发生错误{}".format(k + 1, i + 1, ex))
+                continue
+
+
+if __name__ == "__main__":
+    time1 = time.time()
+    exper12_26()
+    time2 = time.time()
+    print("用时{}".format(time2-time1))
