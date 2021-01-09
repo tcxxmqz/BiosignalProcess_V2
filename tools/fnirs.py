@@ -2,6 +2,7 @@ import neurokit2 as nk
 from tools.biodatacut import *
 from numpy.core.multiarray import ndarray
 from biosppy.plotting import *
+from biosppy.signals.tools import filter_signal
 import pandas as pd
 from scipy.interpolate import interp1d
 
@@ -14,19 +15,20 @@ def fnirs_signal_cut_and_save(file_path, subject, exp_time, start_time, show_CHx
     :param subject:第几位受试者
     :param exp_time:此受试者的第几次实验
     :param start_time:此次实验的开始时间点
-    :param show_CHx:绘制脑血流图像，输入None不绘制图像；输入通道名称，如CH4，绘制此通道的数据；输入all，绘制所有通道的数据到一个图
+    :param show_CHx:绘制脑血流图像，输入None不绘制图像；输入通道名称，如CH4，只绘制此通道的数据；输入all，绘制所有通道的数据到一个图
     :return:返回剪切后的数据，为DataFrame类型的变量fnirs_signal；
     返回剪切后的数据csv文件保存位置，为字符串变量
     """
 
     exp = [60, 40, 34, 30]
 
-    save_as_filename: str = file_path[:-5] + "_" + str(subject) + "_" + str(exp_time) + "_fnirs.csv"
+    fnirs_csv_name: str = file_path[:-5] + "_" + str(subject) + "_" + str(exp_time) + "_fnirs.csv"
+    fnirs_png_name = file_path[:-10] + "png\\" + "exper_" + str(subject) + "_" + str(exp_time) + "_eda.txt"
 
     stop_time = start_time + exp[exp_time - 1]
 
     fnirs_signal = biosignal_cut(file_path, start_time, stop_time, sampling_rate=5, channel="all",
-                                 save_filepath=save_as_filename)
+                                 save_filepath=fnirs_csv_name)
 
     if show_CHx is not None:
 
@@ -43,7 +45,7 @@ def fnirs_signal_cut_and_save(file_path, subject, exp_time, start_time, show_CHx
             ts = np.linspace(0, T, length, endpoint=True)
             fnirs_CHx_plot(ts=ts, CHx_signal=fnirs_signal[show_CHx].astype('float32'), CH=show_CHx, show=True)
 
-    return fnirs_signal, save_as_filename
+    return fnirs_signal, fnirs_csv_name, fnirs_png_name
 
 
 def fnirs_CHx_process(raw_signal, CH: str, path=None, show=False):
@@ -120,7 +122,7 @@ def fnirs_CHx_plot(ts: ndarray = None, CHx_signal: ndarray = None, CH: str = Non
     ax1.plot(ts, CHx_signal, label='Total Hb')
 
     # 设置x, y轴刻度显示范围
-    plt.xlim(-1, 60)
+    plt.xlim(0, 20)  # 不同实验选择不同刻度显示范围：11.16日实验-> 0~60；12.26日实验：-> 0~20。
 
     # 设置x轴刻度
     xmjorLocator = MultipleLocator(2)
@@ -293,11 +295,25 @@ def fnirs_interpolate_process(filepath=None, CH="all"):
 
 
 if __name__ == "__main__":
-    path = r"F:\qz\BiosignalProcess_V2\data\exper_12.26\1\fnirs\exper1_fnirs_3010.csv"
-    fnirs_interpolate_process(path, CH="CH11")
-    b = r"F:\qz\BiosignalProcess_V2\data\exper_12.26\1\fnirs\exper1_fnirs_3010CH11_interpolated.txt"
-    a = pd.read_csv(b)
-    c = a.CH11
+    # path = r"F:\qz\BiosignalProcess_V2\data\exper_12.26\1\fnirs\exper1_fnirs_3010.csv"
+    # fnirs_interpolate_process(path, CH="CH11")
+    # b = r"F:\qz\BiosignalProcess_V2\data\exper_12.26\1\fnirs\exper1_fnirs_3010CH11_interpolated.txt"
+    # a = pd.read_csv(b)
+    # c = a.CH11
+    # import matplotlib.pyplot as plt
+    # plt.plot(c)
+    # plt.show()
     import matplotlib.pyplot as plt
-    plt.plot(c)
+
+    path = "../data/exper_12.26v2/3010/1/exper1_fnirs_3010CH11_interpolated.txt"
+    path2 = "../data/exper_12.26v2/3010/1/exper1_fnirs_3010CH11_interpolated.txt"
+    # a = np.loadtxt(path)
+    fnirs = pd.read_csv(path2, header=0)  # 从第二行开始读，第一行为字符串“CH11”
+    # fnirs = z_score(pd.DataFrame(fnirs, dtype="float32"))  # 需要把元素类型为字符串类型的series转成float类型的dataframe
+    # fnirs = np.array(fnirs.values, dtype="float32").reshape(-1, 1)
+    print(fnirs["CH11"].values)
+    fnirs = fnirs["CH11"].values
+    b, c, d = filter_signal(fnirs, ftype="butter", band="bandpass", order=2, frequency=[0.02, 0.1], sampling_rate=2000)
+    print(len(b))
+    plt.plot(b)
     plt.show()

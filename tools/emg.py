@@ -1,4 +1,4 @@
-import neurokit2.emg as emg
+import neurokit2.emg as nk_emg
 from tools.biodatacut import *
 from biosppy.plotting import plot_emg_qz
 import matplotlib.pyplot as plt
@@ -20,17 +20,18 @@ def emg_signal_cut_and_save(file_path, subject, exp_time, start_time, channel=1,
 
     # filepath = r"C:\Python Files\BiosignalProcessing\data\exper1.mat"
 
-    save_as_filename = file_path[:-5] + "_" + str(subject) + "_" + str(exp_time) + "_emg.txt"
+    emg_txt_name = file_path[:-5] + "_" + str(subject) + "_" + str(exp_time) + "_emg.txt"
+    emg_png_name = file_path[:-10] + "png\\" + "exper_" + str(subject) + "_" + str(exp_time) + "_emg.txt"
 
     stop_time = start_time + exp[exp_time - 1]
 
-    emg_signal = biosignal_cut(file_path, start_time, stop_time, channel=channel, save_filepath=save_as_filename)
+    emg_signal = biosignal_cut(file_path, start_time, stop_time, channel=channel, save_filepath=emg_txt_name)
 
     if show is True:
         plt.plot(emg_signal)
         plt.show()
 
-    return emg_signal, save_as_filename
+    return emg_signal, emg_txt_name, emg_png_name
 
 
 def emg_process(raw_signal, exper, path=None):
@@ -47,7 +48,7 @@ def emg_process(raw_signal, exper, path=None):
 
     sampling_rate = 2000
     # emg_clean = emg.emg_clean_qz_ellip(raw_signal, sampling_rate=sampling_rate)
-    emg_clean = emg.emg_clean(raw_signal, sampling_rate=sampling_rate)
+    emg_clean = nk_emg.emg_clean(raw_signal, sampling_rate=sampling_rate)
 
     length = len(emg_clean)
     T = (length - 1) / sampling_rate
@@ -64,3 +65,11 @@ def emg_process(raw_signal, exper, path=None):
 
     # fig2.savefig(file_path, dpi=300, bbox_inches='tight')
     # plt.show()
+    return emg_clean
+
+
+if __name__ == "__main__":
+    path = "../data/exper_12.26v2/3010/1/exper1_emg_3010.txt"
+    a = np.loadtxt(path)
+    b = nk_emg.emg_clean(a, sampling_rate=2000)
+    print(len(b))

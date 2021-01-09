@@ -20,17 +20,18 @@ def eda_signal_cut_and_save(file_path, subject, exp_time, start_time, channel=2,
 
     # filepath = r"C:\Python Files\BiosignalProcessing\data\exper1.mat"
 
-    save_as_filename = file_path[:-5] + "_" + str(subject) + "_" + str(exp_time) + "_eda.txt"
+    eda_txt_name = file_path[:-5] + "_" + str(subject) + "_" + str(exp_time) + "_eda.txt"
+    eda_png_name = file_path[:-10] + "png\\" + "exper_" + str(subject) + "_" + str(exp_time) + "_eda.txt"
 
     stop_time = start_time + exp[exp_time - 1]
 
-    eda_signal = biosignal_cut(file_path, start_time, stop_time, channel=channel, save_filepath=save_as_filename)
+    eda_signal = biosignal_cut(file_path, start_time, stop_time, channel=channel, save_filepath=eda_txt_name)
 
     if show is True:
         plt.plot(eda_signal)
         plt.show()
 
-    return eda_signal, save_as_filename
+    return eda_signal, eda_txt_name, eda_png_name
 
 
 def eda_process(raw_signal, exper, path=None):
@@ -44,7 +45,7 @@ def eda_process(raw_signal, exper, path=None):
     """
 
     # 降采样
-    downsize_rate = 100
+    downsize_rate = 2000
     down_size = 2000 / downsize_rate
     # raw_signal = np.loadtxt(filepath)
     raw_signal = raw_signal[::int(down_size)]
@@ -84,6 +85,8 @@ def eda_process(raw_signal, exper, path=None):
     else:
         plot_scr_v2(ts=ts, sampling_rate=downsize_rate, filtered=eda_cleaned, onsets=features[0], offsets=features[1],
                     exper=exper, show=False)
+
+    return info["SCR_Onsets"], info["SCR_Offsets"], eda_cleaned
 
 
 def plot_scr_v2(ts: ndarray = None,
@@ -132,7 +135,7 @@ def plot_scr_v2(ts: ndarray = None,
     ax1.tick_params(labelsize=6)
 
     # 设置x轴刻度范围
-    ax1.set_xlim(-1, 60)
+    ax1.set_xlim(0, 20)  # 不同实验选择不同刻度显示范围：11.16日实验-> 0~60；12.26日实验：-> 0~20。
 
     ymin = np.min(filtered)
     ymax = np.max(filtered)
@@ -151,15 +154,15 @@ def plot_scr_v2(ts: ndarray = None,
         ax1.axvspan(xmin=ts[onsets][i], xmax=ts[offsets][i], facecolor='gray', alpha=0.4)
     ax1.axvspan(xmin=ts[onsets][-1], xmax=ts[offsets][-1], facecolor='gray', alpha=0.4, label='SCR')
 
-    # 绘制实验开始，进入场景，轮椅启动，距离障碍物最近，轮椅停止位置
-    ax1.vlines(ts[0], ymin, ymax, color='y', linestyles="--", linewidth=MINOR_LW, label='进入场景')
-    ax1.vlines(ts[15 * sampling_rate], ymin, ymax, color='g', linestyles="--", linewidth=MINOR_LW, label='轮椅启动')
-    obs_distance_time = [45, 30, 26, 24]  # 距离障碍物最近时的时间点
-    ax1.vlines(ts[obs_distance_time[exper - 1] * sampling_rate], ymin, ymax, color='r', linestyles="--",
-               linewidth=MINOR_LW, label='距离最近')
-    wheelchair_stop_time = [55, 36, 30, 27]
-    ax1.vlines(ts[wheelchair_stop_time[exper - 1] * sampling_rate], ymin, ymax, color='b', linestyles="--",
-               linewidth=MINOR_LW, label='轮椅停止')
+    # # 绘制实验开始，进入场景，轮椅启动，距离障碍物最近，轮椅停止位置
+    # ax1.vlines(ts[0], ymin, ymax, color='y', linestyles="--", linewidth=MINOR_LW, label='进入场景')
+    # ax1.vlines(ts[15 * sampling_rate], ymin, ymax, color='g', linestyles="--", linewidth=MINOR_LW, label='轮椅启动')
+    # obs_distance_time = [45, 30, 26, 24]  # 距离障碍物最近时的时间点
+    # ax1.vlines(ts[obs_distance_time[exper - 1] * sampling_rate], ymin, ymax, color='r', linestyles="--",
+    #            linewidth=MINOR_LW, label='距离最近')
+    # wheelchair_stop_time = [55, 36, 30, 27]
+    # ax1.vlines(ts[wheelchair_stop_time[exper - 1] * sampling_rate], ymin, ymax, color='b', linestyles="--",
+    #            linewidth=MINOR_LW, label='轮椅停止')
 
     ax1.set_ylabel('uS')
     ax1.set_xlabel('Time(s)')
@@ -188,236 +191,252 @@ def plot_scr_v2(ts: ndarray = None,
         plt.close(fig)
 
 
-# def plot_eda(ts: ndarray = None,
-#              raw: ndarray = None,
-#              filtered: ndarray = None,
-#              onsets: ndarray = None,
-#              offsets: ndarray = None,
-#              peaks: ndarray = None,
-#              eda_phasic_diffandsmoothed: ndarray = None,
-#              path: str = None,
-#              show: bool = False,
-#              stimulus: bool = False):
-#     """Create a summary plot from the output of signals.eda.eda.
-#
-#     Parameters
-#     ----------
-#     ts : array
-#         Signal time axis reference (seconds).
-#     raw : array
-#         Raw EDA signal.
-#     filtered : array
-#         Filtered EDA signal.
-#     onsets : array
-#         Indices of SCR pulse onsets.
-#     offsets : array
-#         Indices of SCR pulse offsets.
-#     peaks : array
-#         Indices of the SCR peaks.
-#     eda_phasic_diffandsmoothed : array (modified by qz).
-#         eda_phasic_diffandsmoothed.
-#     path : str, optional
-#         If provided, the plot will be saved to the specified file.
-#     show : bool, optional
-#         If True, show the plot immediately.
-#     stimulus : bool, optional
-#         If True, show the stimulus.
-#         绘制预测到的刺激发生时间, 以零点开始的刺激延时作为后续刺激的校准，默认不绘制。
-#     modified by qz at 2020-10-28
-#
-#     """
-#
-#     plt.rcParams['font.sans-serif'] = ['Microsoft YaHei']  # 用来正常显示中文标签
-#     plt.rcParams['axes.unicode_minus'] = False  # 用来正常显示负号
-#
-#     fig = plt.figure()
-#     fig.suptitle('EDA信号处理及SCR检测\n' + path)
-#
-#     # raw signal
-#     ax1 = fig.add_subplot(311)
-#
-#     # ax1.plot(ts, raw, linewidth=MAJOR_LW, label='raw')
-#     ax1.plot(ts, raw, label='raw EDA')
-#
-#     ax1.set_ylabel('Amplitude(uS)')
-#     ax1.legend(loc="upper left", fontsize=6)
-#     ax1.grid()
-#
-#     # 设置x轴刻度
-#     xmjorLocator = MultipleLocator(1)
-#     ax1.xaxis.set_major_locator(xmjorLocator)
-#
-#     # filtered signal with onsets, peaks
-#     ax2 = fig.add_subplot(312, sharex=ax1)
-#
-#     ymin = np.min(filtered)
-#     ymax = np.max(filtered)
-#     alpha = 0.1 * (ymax - ymin)
-#     ymax += alpha
-#     ymin -= alpha
-#
-#     ax2.plot(ts, filtered, label='EDA-Filtered')
-#
-#     # 绘制onsets, peaks, offsets点到图像
-#     ax2.scatter(ts[onsets], filtered[onsets], marker='o', color='b', label='SCR-Onsets')
-#     # ax2.scatter(ts[peaks], filtered[peaks], marker='^', label='SCR-Peaks')
-#     ax2.scatter(ts[offsets], filtered[offsets], marker='x', color='green', label='SCR-Offsets')
-#
-#     # SCR反应区域标记上颜色
-#     i: int
-#
-#     for i in range(0, len(ts[onsets]) - 1):
-#         ax2.axvspan(xmin=ts[onsets][i], xmax=ts[offsets][i], facecolor='gray', alpha=0.4)
-#     ax2.axvspan(xmin=ts[onsets][-1], xmax=ts[offsets][-1], facecolor='gray', alpha=0.4, label='SCR')
-#
-#     # 预测刺激开始的时间，用红色竖线表示
-#     if stimulus:
-#         stimulus_list = onsets - onsets[0]
-#         ax2.vlines(ts[stimulus_list], ymin, ymax,
-#                    color='r',
-#                    linewidth=MINOR_LW,
-#                    label='Stimulus')
-#
-#     ax2.set_ylabel('Amplitude(uS)')
-#     ax2.legend(loc="upper right", fontsize=5)
-#     ax2.grid()
-#
-#     # eda_phasic_diffandsmoothed
-#     ax3 = fig.add_subplot(313, sharex=ax1)
-#     ax3.plot(ts[:len(eda_phasic_diffandsmoothed)], eda_phasic_diffandsmoothed, label='EDA-processed')
-#
-#     # ax3.hlines(0, 0, ts[-1], colors='r', linestyles='dashed')
-#     ax3.axhline(color='orange', ls='dashed')
-#
-#     ax3.scatter(ts[onsets], eda_phasic_diffandsmoothed[onsets], marker='o', color='b', label='SCR-Onsets')
-#     ax3.scatter(ts[peaks], eda_phasic_diffandsmoothed[peaks], marker='^', color='orange', label='SCR-Peaks')
-#     ax3.scatter(ts[offsets], eda_phasic_diffandsmoothed[offsets], marker='x', color='green', label='SCR-Offsets')
-#
-#     # SCR反应区域标记上颜色
-#     for i in range(0, len(ts[onsets]) - 1):
-#         ax3.axvspan(xmin=ts[onsets][i], xmax=ts[offsets][i], facecolor='gray', alpha=0.4)
-#     ax3.axvspan(xmin=ts[onsets][-1], xmax=ts[offsets][-1], facecolor='gray', alpha=0.4, label='SCR')
-#
-#     ax3.set_xlabel('Time(s)')
-#     ax3.set_ylabel('Amplitude(uS)')
-#     ax3.legend(loc="upper right", fontsize=5)
-#     ax3.grid()
-#
-#     # make layout tight
-#     fig.tight_layout()
-#
-#     # save to file
-#     if path is not None:
-#         path = utils.normpath(path)
-#         root, ext = os.path.splitext(path)
-#         ext = ext.lower()
-#         if ext not in ['png', 'jpg']:
-#             path = root + '.png'
-#
-#         fig.savefig(path, dpi=300, bbox_inches='tight')
-#
-#     # show
-#     if show:
-#         plt.show()
-#     else:
-#         # close
-#         plt.close(fig)
-#
-#
-# def plot_scr(ts: ndarray = None,
-#              filtered: ndarray = None,
-#              onsets: ndarray = None,
-#              offsets: ndarray = None,
-#              path: str = None,
-#              show: bool = False,
-#              stimulus: object = False):
-#     """绘制SCR到图像
-#
-#         Parameters
-#         ----------
-#         ts : array
-#             Signal time axis reference (seconds).
-#         filtered : array
-#             Filtered EDA signal.
-#         onsets : array
-#             Indices of SCR pulse onsets.
-#         offsets : array
-#             Indices of SCR pulse offsets.
-#         path : str, optional
-#             If provided, the plot will be saved to the specified file.
-#         show : bool, optional
-#             If True, show the plot immediately.
-#         stimulus : bool, optional
-#             If True, show the stimulus.
-#             绘制预测到的刺激发生时间, 以零点开始的刺激延时作为后续刺激的校准，默认不绘制。
-#         modified by qz at 2020-10-28
-#
-#         """
-#
-#     plt.rcParams['font.sans-serif'] = ['Microsoft YaHei']  # 用来正常显示中文标签
-#     plt.rcParams['axes.unicode_minus'] = False  # 用来正常显示负号
-#
-#     fig = plt.figure()
-#     fig.suptitle('EDA处理及SCR检测\n')
-#
-#     # filtered signal with onsets, peaks, SCR
-#     ax1 = fig.add_subplot(311)
-#
-#     # 给子图设置标题
-#     ax1.set_title(path)
-#
-#     # 设置x轴刻度
-#     xmjorLocator = MultipleLocator(2)
-#     ax1.xaxis.set_major_locator(xmjorLocator)
-#
-#     # 设置x轴刻度范围
-#     ax1.set_xlim(0, 60)
-#
-#     ymin = np.min(filtered)
-#     ymax = np.max(filtered)
-#     alpha = 0.1 * (ymax - ymin)
-#     ymax += alpha
-#     ymin -= alpha
-#
-#     ax1.plot(ts, filtered, label='EDA-Filtered')
-#
-#     # 绘制onsets, offsets点到图像
-#     # ax1.scatter(ts[onsets], filtered[onsets], marker='o', color='b', label='SCR-Onsets')
-#     # ax1.scatter(ts[offsets], filtered[offsets], marker='x', color='green', label='SCR-Offsets')
-#
-#     # SCR反应区域标记上颜色
-#     for i in range(0, len(ts[onsets]) - 1):
-#         ax1.axvspan(xmin=ts[onsets][i], xmax=ts[offsets][i], facecolor='gray', alpha=0.4)
-#     ax1.axvspan(xmin=ts[onsets][-1], xmax=ts[offsets][-1], facecolor='gray', alpha=0.4, label='SCR')
-#
-#     # 预测刺激开始的时间，用红色竖线表示
-#     if stimulus:
-#         stimulus_list = onsets - onsets[0]
-#         ax1.vlines(ts[stimulus_list], ymin, ymax,
-#                    color='r',
-#                    linewidth=MINOR_LW,
-#                    label='Stimulus')
-#
-#     ax1.set_ylabel('Amplitude(uS)')
-#     ax1.legend(loc="upper left", fontsize=4)
-#     ax1.grid()
-#
-#     # make layout tight
-#     fig.tight_layout()
-#
-#     # save to file
-#     if path is not None:
-#         path = utils.normpath(path)
-#         root, ext = os.path.splitext(path)
-#         ext = ext.lower()
-#         if ext not in ['png', 'jpg']:
-#             path = root + '_scr.png'
-#
-#         fig.savefig(path, dpi=300, bbox_inches='tight')
-#
-#     # show
-#     if show:
-#         plt.show()
-#     else:
-#         # close
-#         plt.close(fig)
+def plot_eda(ts: ndarray = None,
+             raw: ndarray = None,
+             filtered: ndarray = None,
+             onsets: ndarray = None,
+             offsets: ndarray = None,
+             peaks: ndarray = None,
+             eda_phasic_diffandsmoothed: ndarray = None,
+             path: str = None,
+             show: bool = False,
+             stimulus: bool = False):
+    """Create a summary plot from the output of signals.eda.eda.
+
+    Parameters
+    ----------
+    ts : array
+        Signal time axis reference (seconds).
+    raw : array
+        Raw EDA signal.
+    filtered : array
+        Filtered EDA signal.
+    onsets : array
+        Indices of SCR pulse onsets.
+    offsets : array
+        Indices of SCR pulse offsets.
+    peaks : array
+        Indices of the SCR peaks.
+    eda_phasic_diffandsmoothed : array (modified by qz).
+        eda_phasic_diffandsmoothed.
+    path : str, optional
+        If provided, the plot will be saved to the specified file.
+    show : bool, optional
+        If True, show the plot immediately.
+    stimulus : bool, optional
+        If True, show the stimulus.
+        绘制预测到的刺激发生时间, 以零点开始的刺激延时作为后续刺激的校准，默认不绘制。
+    modified by qz at 2020-10-28
+
+    """
+
+    plt.rcParams['font.sans-serif'] = ['Microsoft YaHei']  # 用来正常显示中文标签
+    plt.rcParams['axes.unicode_minus'] = False  # 用来正常显示负号
+
+    fig = plt.figure()
+    fig.suptitle('EDA信号处理及SCR检测\n' + path)
+
+    # raw signal
+    ax1 = fig.add_subplot(311)
+
+    # ax1.plot(ts, raw, linewidth=MAJOR_LW, label='raw')
+    ax1.plot(ts, raw, label='raw EDA')
+
+    ax1.set_ylabel('Amplitude(uS)')
+    ax1.legend(loc="upper left", fontsize=6)
+    ax1.grid()
+
+    # 设置x轴刻度
+    xmjorLocator = MultipleLocator(1)
+    ax1.xaxis.set_major_locator(xmjorLocator)
+
+    # filtered signal with onsets, peaks
+    ax2 = fig.add_subplot(312, sharex=ax1)
+
+    ymin = np.min(filtered)
+    ymax = np.max(filtered)
+    alpha = 0.1 * (ymax - ymin)
+    ymax += alpha
+    ymin -= alpha
+
+    ax2.plot(ts, filtered, label='EDA-Filtered')
+
+    # 绘制onsets, peaks, offsets点到图像
+    ax2.scatter(ts[onsets], filtered[onsets], marker='o', color='b', label='SCR-Onsets')
+    # ax2.scatter(ts[peaks], filtered[peaks], marker='^', label='SCR-Peaks')
+    ax2.scatter(ts[offsets], filtered[offsets], marker='x', color='green', label='SCR-Offsets')
+
+    # SCR反应区域标记上颜色
+    i: int
+
+    for i in range(0, len(ts[onsets]) - 1):
+        ax2.axvspan(xmin=ts[onsets][i], xmax=ts[offsets][i], facecolor='gray', alpha=0.4)
+    ax2.axvspan(xmin=ts[onsets][-1], xmax=ts[offsets][-1], facecolor='gray', alpha=0.4, label='SCR')
+
+    # 预测刺激开始的时间，用红色竖线表示
+    if stimulus:
+        stimulus_list = onsets - onsets[0]
+        ax2.vlines(ts[stimulus_list], ymin, ymax,
+                   color='r',
+                   linewidth=MINOR_LW,
+                   label='Stimulus')
+
+    ax2.set_ylabel('Amplitude(uS)')
+    ax2.legend(loc="upper right", fontsize=5)
+    ax2.grid()
+
+    # eda_phasic_diffandsmoothed
+    ax3 = fig.add_subplot(313, sharex=ax1)
+    ax3.plot(ts[:len(eda_phasic_diffandsmoothed)], eda_phasic_diffandsmoothed, label='EDA-processed')
+
+    # ax3.hlines(0, 0, ts[-1], colors='r', linestyles='dashed')
+    ax3.axhline(color='orange', ls='dashed')
+
+    ax3.scatter(ts[onsets], eda_phasic_diffandsmoothed[onsets], marker='o', color='b', label='SCR-Onsets')
+    ax3.scatter(ts[peaks], eda_phasic_diffandsmoothed[peaks], marker='^', color='orange', label='SCR-Peaks')
+    ax3.scatter(ts[offsets], eda_phasic_diffandsmoothed[offsets], marker='x', color='green', label='SCR-Offsets')
+
+    # SCR反应区域标记上颜色
+    for i in range(0, len(ts[onsets]) - 1):
+        ax3.axvspan(xmin=ts[onsets][i], xmax=ts[offsets][i], facecolor='gray', alpha=0.4)
+    ax3.axvspan(xmin=ts[onsets][-1], xmax=ts[offsets][-1], facecolor='gray', alpha=0.4, label='SCR')
+
+    ax3.set_xlabel('Time(s)')
+    ax3.set_ylabel('Amplitude(uS)')
+    ax3.legend(loc="upper right", fontsize=5)
+    ax3.grid()
+
+    # make layout tight
+    fig.tight_layout()
+
+    # save to file
+    if path is not None:
+        path = utils.normpath(path)
+        root, ext = os.path.splitext(path)
+        ext = ext.lower()
+        if ext not in ['png', 'jpg']:
+            path = root + '.png'
+
+        fig.savefig(path, dpi=300, bbox_inches='tight')
+
+    # show
+    if show:
+        plt.show()
+    else:
+        # close
+        plt.close(fig)
+
+
+def plot_scr(ts: ndarray = None,
+             filtered: ndarray = None,
+             onsets: ndarray = None,
+             offsets: ndarray = None,
+             path: str = None,
+             show: bool = False,
+             stimulus: object = False):
+    """绘制SCR到图像
+
+        Parameters
+        ----------
+        ts : array
+            Signal time axis reference (seconds).
+        filtered : array
+            Filtered EDA signal.
+        onsets : array
+            Indices of SCR pulse onsets.
+        offsets : array
+            Indices of SCR pulse offsets.
+        path : str, optional
+            If provided, the plot will be saved to the specified file.
+        show : bool, optional
+            If True, show the plot immediately.
+        stimulus : bool, optional
+            If True, show the stimulus.
+            绘制预测到的刺激发生时间, 以零点开始的刺激延时作为后续刺激的校准，默认不绘制。
+        modified by qz at 2020-10-28
+
+        """
+
+    plt.rcParams['font.sans-serif'] = ['Microsoft YaHei']  # 用来正常显示中文标签
+    plt.rcParams['axes.unicode_minus'] = False  # 用来正常显示负号
+
+    fig = plt.figure()
+    fig.suptitle('EDA处理及SCR检测\n')
+
+    # filtered signal with onsets, peaks, SCR
+    ax1 = fig.add_subplot(311)
+
+    # 给子图设置标题
+    ax1.set_title(path)
+
+    # 设置x轴刻度
+    xmjorLocator = MultipleLocator(2)
+    ax1.xaxis.set_major_locator(xmjorLocator)
+
+    # 设置x轴刻度范围
+    ax1.set_xlim(0, 60)
+
+    ymin = np.min(filtered)
+    ymax = np.max(filtered)
+    alpha = 0.1 * (ymax - ymin)
+    ymax += alpha
+    ymin -= alpha
+
+    ax1.plot(ts, filtered, label='EDA-Filtered')
+
+    # 绘制onsets, offsets点到图像
+    # ax1.scatter(ts[onsets], filtered[onsets], marker='o', color='b', label='SCR-Onsets')
+    # ax1.scatter(ts[offsets], filtered[offsets], marker='x', color='green', label='SCR-Offsets')
+
+    # SCR反应区域标记上颜色
+    for i in range(0, len(ts[onsets]) - 1):
+        ax1.axvspan(xmin=ts[onsets][i], xmax=ts[offsets][i], facecolor='gray', alpha=0.4)
+    ax1.axvspan(xmin=ts[onsets][-1], xmax=ts[offsets][-1], facecolor='gray', alpha=0.4, label='SCR')
+
+    # 预测刺激开始的时间，用红色竖线表示
+    if stimulus:
+        stimulus_list = onsets - onsets[0]
+        ax1.vlines(ts[stimulus_list], ymin, ymax,
+                   color='r',
+                   linewidth=MINOR_LW,
+                   label='Stimulus')
+
+    ax1.set_ylabel('Amplitude(uS)')
+    ax1.legend(loc="upper left", fontsize=4)
+    ax1.grid()
+
+    # make layout tight
+    fig.tight_layout()
+
+    # save to file
+    if path is not None:
+        path = utils.normpath(path)
+        root, ext = os.path.splitext(path)
+        ext = ext.lower()
+        if ext not in ['png', 'jpg']:
+            path = root + '_scr.png'
+
+        fig.savefig(path, dpi=300, bbox_inches='tight')
+
+    # show
+    if show:
+        plt.show()
+    else:
+        # close
+        plt.close(fig)
+
+
+if __name__ == "__main__":
+    import numpy as np
+    import matplotlib.pyplot as plt
+    path = "../data/exper_12.26/1/exper1_eda_5760.txt"
+    signal = np.loadtxt(path)
+    plt.plot(signal)
+    # plt.show()
+    onsets, offsets = eda_process(raw_signal=signal, exper=1)
+    print("signal len = {}".format(len(signal)))
+    print("onsets = {}, offsets = {}".format(onsets, offsets))
+    a = signal[onsets[0]:offsets[0]]
+    plt.plot(a)
+    print("onsets = {}, offsets = {}".format(onsets*20, offsets*20))
+    plt.show()

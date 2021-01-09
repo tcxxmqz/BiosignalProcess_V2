@@ -944,7 +944,7 @@ def plot_emg_qz(ts=None, emg_cleaned=None, path=None, show=None):
     ax1 = fig.add_subplot(311)
     ax1.plot(ts, emg_cleaned, label="EMG")
 
-    plt.xlim(-1, 60)
+    plt.xlim(0, 20)  # 不同实验选择不同刻度显示范围：11.16日实验-> 0~60；12.26日实验：-> 0~20。
     plt.ylim(-0.1, 0.1)
 
     xmjorLocator = MultipleLocator(2)
@@ -1486,7 +1486,7 @@ def plot_ecg_qz(heart_rate_ts=None,
     ax1.plot(heart_rate_ts, heart_rate, label='Hart Rate')
 
     # 设置x, y轴刻度显示范围
-    plt.xlim(-1, 60)
+    plt.xlim(0, 20)  # 不同实验选择不同刻度显示范围：11.16日实验-> 0~60；12.26日实验：-> 0~20。
     plt.ylim(50, 100)
 
     # 设置x轴刻度间隔

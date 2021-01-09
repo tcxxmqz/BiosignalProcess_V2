@@ -19,17 +19,18 @@ def ecg_signal_cut_and_save(file_path, subject, exp_time, start_time, channel=0,
 
     # filepath = r"C:\PythonFiles\BiosignalProcessing\data\exper1.mat"
 
-    save_as_filename = file_path[:-5] + "_" + str(subject) + "_" + str(exp_time) + "_ecg.txt"
+    ecg_txt_name = file_path[:-5] + "_" + str(subject) + "_" + str(exp_time) + "_ecg.txt"
+    ecg_png_name = file_path[:-10] + "png\\" + "exper_" + str(subject) + "_" + str(exp_time) + "_ecg.txt"
 
     stop_time = start_time + exp[exp_time - 1]
 
-    ecg_signal = biosignal_cut(file_path, start_time, stop_time, channel=channel, save_filepath=save_as_filename)
+    ecg_signal = biosignal_cut(file_path, start_time, stop_time, channel=channel, save_filepath=ecg_txt_name)
 
     if show is True:
         plt.plot(ecg_signal)
         plt.show()
 
-    return ecg_signal, save_as_filename
+    return ecg_signal, ecg_txt_name, ecg_png_name
 
 
 def ecg_process(raw_signal, exper, path=None):
@@ -46,15 +47,30 @@ def ecg_process(raw_signal, exper, path=None):
     print("ecg_process()正在处理第{}次实验数据。".format(exper))
     biosppy_ecg.ecg(signal=raw_signal, sampling_rate=2000, show=False, plot_method="qz", path=file_path)
 
-# # 载入数据
-# path = "C:\\Python Files\\biology_signal\\data_set\\1B\\5\\XD.txt"
-# raw_signals = np.loadtxt(path)
-#
-# # 信号处理及绘图 neurokit2
-# # signals, info = nk.ecg_process(raw_signals, sampling_rate=2000)
-# # fig = nk.ecg_plot(signals, sampling_rate=2000)
-#
-# # 信号处理及绘图 biosppy
-# biosppy_ecg.ecg(signal=raw_signals, sampling_rate=2000, show=True, plot_method='qz', path=path)
-#
-# plt.show()
+
+if __name__ == "__main__":
+
+    # import neurokit2 as nk
+    # # 载入数据
+    # path = "C:\\Python Files\\biology_signal\\data_set\\1B\\5\\XD.txt"
+    # raw_signals = np.loadtxt(path)
+    #
+    # # 信号处理及绘图 neurokit2
+    # signals, info = nk.ecg_process(raw_signals, sampling_rate=2000)
+    # fig = nk.ecg_plot(signals, sampling_rate=2000)
+    #
+    # # 信号处理及绘图 biosppy
+    # biosppy_ecg.ecg(signal=raw_signals, sampling_rate=2000, show=True, plot_method='qz', path=path)
+    #
+    # plt.show()
+
+    # file_path = r"C:\PythonFiles\BiosignalProcessing\data\exper1.mat"
+    # subject = 1
+    # exp_time = 1
+    #
+    # ecg_png_name = file_path[:-10] + "png\\" + "exper_" + str(subject) + "_" + str(exp_time) + "_ecg.txt"
+    # print(ecg_png_name)
+    file = "../data/exper_12.26v2/3010/1/exper1_ecg_3010.txt"
+    ecg = np.loadtxt(file)
+    info = biosppy_ecg.ecg(ecg, sampling_rate=2000, show=False, plot_method="qz")
+    print(len(info["filtered"]))

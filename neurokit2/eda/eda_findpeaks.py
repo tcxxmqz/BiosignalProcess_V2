@@ -415,7 +415,7 @@ def _eda_findpeaks_nabian2018qz(eda_phasic):
     # zero crossings
     pos_crossings = signal_zerocrossings(eda_phasic, direction="positive")
     neg_crossings = signal_zerocrossings(eda_phasic, direction="negative")
-    print("1---pos_crossings = {}, neg_crossings = {}".format(pos_crossings, neg_crossings))
+    # print("1---pos_crossings = {}, neg_crossings = {}".format(pos_crossings, neg_crossings))
 
     # Sanitize consecutive crossings
     # modified by qz
@@ -424,14 +424,14 @@ def _eda_findpeaks_nabian2018qz(eda_phasic):
             pos_crossings = pos_crossings[0:len(neg_crossings)]
         elif len(pos_crossings) < len(neg_crossings):
             neg_crossings = neg_crossings[0:len(pos_crossings)]
-        print("2---pos_crossings = {}, neg_crossings = {}".format(pos_crossings, neg_crossings))
+        # print("2---pos_crossings = {}, neg_crossings = {}".format(pos_crossings, neg_crossings))
     else:
         neg_crossings = neg_crossings[1:]
         if len(pos_crossings) > len(neg_crossings):
             pos_crossings = pos_crossings[0:len(neg_crossings)]
         elif len(pos_crossings) < len(neg_crossings):
             neg_crossings = neg_crossings[0:len(pos_crossings)]
-        print("3---pos_crossings = {}, neg_crossings = {}".format(pos_crossings, neg_crossings))
+        # print("3---pos_crossings = {}, neg_crossings = {}".format(pos_crossings, neg_crossings))
 
     # modified by qz
     peaks_list = []
@@ -443,7 +443,7 @@ def _eda_findpeaks_nabian2018qz(eda_phasic):
         window = eda_phasic[i:j]
         _amp.append(np.max(window))
         max_amp = np.max(_amp)
-    print("4---amps = {}, \n4---max_amp = {}".format(_amp, max_amp))
+    # print("4---amps = {}, \n4---max_amp = {}".format(_amp, max_amp))
 
     for i, j in zip(pos_crossings, neg_crossings):
         window = eda_phasic[i:j]
@@ -458,7 +458,7 @@ def _eda_findpeaks_nabian2018qz(eda_phasic):
             amps_list.append(amp)
             # modified by qz
             offsets_list.append(j)
-    print("5---pos_list = {}, neg_list = {}".format(onsets_list, offsets_list))
+    # print("5---pos_list = {}, neg_list = {}".format(onsets_list, offsets_list))
 
     # output
     # info = {"SCR_Onsets": np.array(onsets_list), "SCR_Peaks": np.hstack(np.array(peaks_list)),
